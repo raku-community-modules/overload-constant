@@ -1,12 +1,25 @@
 {
-    "perl" : "6.*",
-    "name" : "overload::constant",
-    "author" : "github:FROGGS",
-    "version" : "0.0.2",
-    "description" : "allows to intercept parsing of num/str literals",
-    "depends" : [ ],
-    "provides" : {
-        "overload::constant" : "lib/overload/constant.pm"
-    },
-    "source-url" : "git://github.com/FROGGS/p6-overload-constant.git"
+  "auth": "zef:raku-community-modules",
+  "author": "Tobias Leich",
+  "build-depends": [
+  ],
+  "depends": [
+  ],
+  "description": "Change stringification behaviour of literals",
+  "license": "NOASSERTION",
+  "name": "overload::constant",
+  "perl": "6.*",
+  "provides": {
+    "overload::constant": "lib/overload/constant.rakumod"
+  },
+  "resources": [
+  ],
+  "source-url": "https://github.com/raku-community-modules/overload-constant.git",
+  "tags": [
+    "SLANG",
+    "OVERLOAD"
+  ],
+  "test-depends": [
+  ],
+  "version": "0.0.2"
 }
