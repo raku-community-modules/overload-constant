@@ -1,6 +1,10 @@
 Revision history for overload::constant
 
 {{$NEXT}}
+    - Work on the RakuAST frontend as well as the legacy one
+    - Defer to the standard action for literals that were given no
+      handler, which also fixes rational, unum, hex float and Inf
+      literals in a scope that sets no numish handler
 
 0.0.3  2024-12-25T13:51:58+01:00
     - Initial version

@@ -4,37 +4,49 @@ my sub atkeyish(Mu \h, \k) {
     nqp::atkey(nqp::findmethod(h, 'hash')(h), k)
 }
 
+# Hand a handler's return value to the parser as a compile-time constant.
+# The RakuAST frontend has no $*W, and reading a missing dynamic throws,
+# so probe for it with getlexdyn rather than naming it. The node class is
+# fetched by string for a similar reason. Naming RakuAST:: outright needs
+# 'use experimental :rakuast', which compilers before 2023.02 reject.
+my sub constantize(Mu \actions, Mu $/, Mu $value) {
+    if nqp::isnull(nqp::getlexdyn('$*W')) {
+        actions.attach: $/, ::("RakuAST::Constant").new(nqp::decont($value))
+    }
+    else {
+        $/.make(do given nqp::decont($value) {
+            when Str { $*W.add_string_constant(nqp::unbox_s($_)) }
+            when Int { $*W.add_numeric_constant($/, 'Int', nqp::unbox_i($_)) }
+            when Num { $*W.add_numeric_constant($/, 'Num', nqp::unbox_n($_)) }
+            when Rat { $*W.add_numeric_constant($/, 'Num', nqp::unbox_n($_.Num)) }
+        })
+    }
+}
+
 my role Numish[%handlers] {
     method numish(Mu $/) {
+        my $handler;
+        my $source;
 
-        sub call-handler($r) {
-            do given nqp::decont($r) {
-                when Str { $*W.add_string_constant( nqp::unbox_s($_) ) }
-                when Int { $*W.add_numeric_constant($/, 'Int', nqp::unbox_i($_)) }
-                when Num { $*W.add_numeric_constant($/, 'Num', nqp::unbox_n($_)) }
-                when Rat { $*W.add_numeric_constant($/, 'Num', nqp::unbox_n($_.Num)) }
-            }
-        }
         if atkeyish($/, 'integer') -> $v {
-            $/.make( %handlers<integer>
-              ?? call-handler(%handlers<integer>(nqp::p6box_s($v.Str)))
-              !! $*W.add_numeric_constant($/, 'Int', $v.made) )
+            $handler := %handlers<integer>;
+            $source  := $v.Str;
         }
-        elsif atkeyish($/, 'dec_number') -> $v {
-            $/.make( %handlers<decimal>
-              ?? call-handler(%handlers<decimal>(nqp::p6box_s($v.Str)))
-              !! $v.made )
+        elsif (atkeyish($/, 'decimal-number') || atkeyish($/, 'dec_number')) -> $v {
+            $handler := %handlers<decimal>;
+            $source  := $v.Str;
         }
-        elsif atkeyish($/, 'rad_number') -> $v {
-            $/.make( %handlers<radix>
-              ?? call-handler(%handlers<radix>(nqp::p6box_s($v.Str)))
-              !! $v.made )
+        elsif (atkeyish($/, 'radix-number') || atkeyish($/, 'rad_number')) -> $v {
+            $handler := %handlers<radix>;
+            $source  := $v.Str;
         }
         else {
-            $/.make( %handlers<numish>
-              ?? call-handler(%handlers<numish>(nqp::p6box_s($/.Str)))
-              !! $*W.add_numeric_constant($/, 'Num', +nqp::p6box_s($/.Str)) )
+            $handler := %handlers<numish>;
+            $source  := $/.Str;
         }
+
+        nextsame unless $handler;
+        constantize(self, $/, $handler(nqp::p6box_s($source)))
     }
 }
 
