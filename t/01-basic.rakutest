@@ -1,6 +1,6 @@
 use Test;
 
-plan 9;
+plan 13;
 
 {
     sub integer { "i$^a" }
@@ -28,6 +28,23 @@ plan 9;
     use overload::constant &integer;
 
     ok 42 == 21.0, 'overloaded integer can return an integer';
+}
+
+# Computed out here because an overloaded integer would otherwise turn
+# every expected value in the block below into a Str.
+my $half  = 0.5;
+my $fifty = 50;
+my $third = 2 / 3;
+my $inf   = Inf;
+
+{
+    sub integer { "i$^a" }
+    use overload::constant &integer;
+
+    ok <1/2>    == $half,  'rational literal is left alone when it has no handler';
+    ok Ⅼ        == $fifty, 'unum integer literal is left alone when it has no handler';
+    ok ⅔        == $third, 'unum rational literal is left alone when it has no handler';
+    ok ∞        == $inf,   'infinity literal is left alone when it has no handler';
 }
 
 ok 42 !~~ Str,  'overload only happens inside its scope';
