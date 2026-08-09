@@ -27,19 +27,23 @@ ok NaN     ~~ Str && NaN     eq 'nNaN',     'can overload other numish things';
 DESCRIPTION
 ===========
 
-It is meant to work a bit like Perl's [overload::constant](https://perldoc.perl.org/overload#Overloading-Constants), though it is kind of pre-alpha here.
+It is meant to work a bit like Perl's [overload::constant](https://perldoc.perl.org/overload#Overloading-Constants).
+
+The positional arguments given to `use overload::constant` are keyed to the name of the subroutine being passed.
 
 AUTHOR
 ======
 
 Tobias Leich
 
+Source can be located at: https://github.com/raku-community-modules/overload-constant . Comments and Pull Requests are welcome.
+
 COPYRIGHT AND LICENSE
 =====================
 
 Copyright 2014 - 2017 Tobias Leich
 
-Copyright 2024 Raku Community
+Copyright 2024, 2026 Raku Community
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 
