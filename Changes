@@ -1,6 +1,8 @@
 Revision history for overload::constant
 
 {{$NEXT}}
+
+0.0.4  2026-08-09T14:45:40+02:00
     - Work on the RakuAST frontend as well as the legacy one
     - Defer to the standard action for literals that were given no
       handler, which also fixes rational, unum, hex float and Inf
